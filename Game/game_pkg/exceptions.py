@@ -9,3 +9,6 @@ class CharAlreadyStored(Exception):
 
 class CharNotStored(Exception):
     pass
+
+class UnsupportedDatabaseEngine(Exception):
+    pass

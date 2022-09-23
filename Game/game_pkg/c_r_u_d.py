@@ -5,12 +5,61 @@
 from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.exc import IntegrityError, NoSuchTableError
 from game_pkg import exceptions as mvc_exc
-
+from sqlalchemy import create_engine
 
 import dataset
-conn = dataset.connect('sqlite:///:memory:')
-DB_name = "sqlite:///:memory:"
+user = 'postgres'
+pw = 'PGAADMIN'
+db_type = 'postgresql'
+port = '5432'
+hostserver = 'localhost'
+DB_name = "Arena"
+conn_str = f'{db_type}://{user}:{pw}@{hostserver}:{port}/{DB_name}'
+engine = create_engine(conn_str)
 
+
+
+
+
+
+def connect_to_db(db_name=DB_name, db_engine='postgresql'):
+    """Connect to a database. Create the database if there isn't one yet.
+
+    The database can be a SQLite DB (either a DB file or an in-memory DB), or a PostgreSQL DB. In order to connect to a PostgreSQL DB you have first to create a database, create a user, and finally grant him all necessary privileges on that database and tables.
+    'postgresql://<username>:<password>@localhost:<PostgreSQL port>/<db name>'
+    Note: at the moment it looks it's not possible to close a connection manually (e.g. like calling conn.close() in sqlite3).
+
+
+    Parameters
+    ----------
+    db_name : str or None
+        database name (without file extension .db)
+    db_engine : str
+        database engine ('sqlite' or 'postgres')
+
+    Returns
+    -------
+    dataset.persistence.database.Database
+        connection to a database
+    """
+    engines = set('postgres')
+    if db_name is None:
+        db_string = 'sqlite:///:memory:'
+        print('New connection to in-memory SQLite DB...')
+    else:
+        if db_engine == 'sqlite':
+            db_string = 'sqlite:///{}.db'.format(DB_name)
+            print('New connection to SQLite DB...')
+        elif db_engine == 'postgres':
+            db_string = \
+                f'{conn_str}'
+            print('New connection to PostgreSQL DB...')
+        else:
+            raise mvc_exc.UnsupportedDatabaseEngine(
+                'No database engine with this name. '
+                'Choose one of the following: {}'.format(engines))
+
+    return dataset.connect(db_string)
 
 
 def create_table(conn, table_name):
@@ -38,7 +87,7 @@ Create
 
 
 
-def insert_char(conn, name, ac, damage, hp, to_hit, table_name):
+def insert_char(conn, name, ac, damage, hp, to_hit,table_name):
     """Insert a single item in a table.
 
     Parameters

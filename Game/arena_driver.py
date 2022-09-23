@@ -6,7 +6,7 @@ from game_pkg import c_r_u_d
 from game_pkg import exceptions as mvc_exc
 from game_pkg import arena_method as a_h_m
 from game_pkg.game_controller import Game_Controller 
-from game_pkg.game_model import Character_Model
+from game_pkg.game_model import ModelDataset
 from game_pkg.game_view import Game_View
 
 
@@ -27,20 +27,30 @@ def main():
                        {"name": "Feet", "ac": 5, "damage": 60, "hp": 120, "to_hit": 25}]
 
 
-    character1 = Game_Controller(Character_Model(opponents), Game_View())
-    character2 = Game_Controller(Character_Model(opponents), Game_View())
-    #monster1 = Controller(ModelBasic(my_items2), View())
-    character2.show_char("Brute")
-    character1.show_chars()
-    # character1.insert_char("supremecommander", 5, 75, 200, 45)
-    # character1.show_chars()
-    # character1.delete_char("supremecommander")
-    # character1.show_char("elite")
-    # character1.show_chars()
-    # character1.show_char("bob")
-    # character1.update_char("supremecommander", 10, 75, 250, 75)
-    # character1.show_char("supremecommander")
+    '''
+    Practice area
+    '''
+    # insert_char(conn, 'DeathLaser', ac=7, damage=50, hp=175,to_hit=30, table_name='chars')
+    # print(select_char(conn, 'Brute', table_name='chars'))
+    # print(select_all(conn, table_name='chars'))
 
+ 
+    '''
+    Practice area
+    '''
+    # insert_char(conn, 'DeathLaser', ac=7, damage=50, hp=175,to_hit=30, table_name='chars')
+    # print(select_char(conn, 'Brute', table_name='chars'))
+    # print(select_all(conn, table_name='chars'))
+
+    '''
+    Game Driver Code
+    '''
+    opponent1 = Game_Controller(ModelDataset(opponents), Game_View())
+    opponent1.show_chars()
+    opponent2 = Game_Controller(ModelDataset(opponents), Game_View())
+    opponent2.show_char('Brute')
+
+    #battle = battle_cycle(opponent1, opponent2 )
 
 if __name__ == '__main__':
     main()
