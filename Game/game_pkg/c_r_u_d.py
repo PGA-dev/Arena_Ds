@@ -8,13 +8,13 @@ from game_pkg import exceptions as mvc_exc
 from sqlalchemy import create_engine
 
 import dataset
-user = 'postgres'
-pw = 'PGAADMIN'
-db_type = 'postgresql'
-port = '5432'
-hostserver = 'localhost'
+user = "postgres"
+pw = "PGAADMIN"
+db_type = "postgresql"
+port = "5432"
+hostserver = "localhost"
 DB_name = "Arena"
-conn_str = f'{db_type}://{user}:{pw}@{hostserver}:{port}/{DB_name}'
+conn_str = f"{db_type}://{user}:{pw}@{hostserver}:{port}/{DB_name}"
 engine = create_engine(conn_str)
 
 
@@ -22,7 +22,7 @@ engine = create_engine(conn_str)
 
 
 
-def connect_to_db(db_name=DB_name, db_engine='postgresql'):
+def connect_to_db(db_name=DB_name, db_engine=engine):
     """Connect to a database. Create the database if there isn't one yet.
 
     The database can be a SQLite DB (either a DB file or an in-memory DB), or a PostgreSQL DB. In order to connect to a PostgreSQL DB you have first to create a database, create a user, and finally grant him all necessary privileges on that database and tables.
@@ -42,22 +42,22 @@ def connect_to_db(db_name=DB_name, db_engine='postgresql'):
     dataset.persistence.database.Database
         connection to a database
     """
-    engines = set('postgres')
+    engines = set("postgres")
     if db_name is None:
-        db_string = 'sqlite:///:memory:'
-        print('New connection to in-memory SQLite DB...')
+        db_string = "sqlite:///:memory:"
+        print(f"New connection to in-memory SQLite DB...")
     else:
-        if db_engine == 'sqlite':
-            db_string = 'sqlite:///{}.db'.format(DB_name)
-            print('New connection to SQLite DB...')
-        elif db_engine == 'postgres':
+        if db_engine == "sqlite":
+            db_string = f"sqlite:///{DB_name}.db"
+            print(f"New connection to SQLite DB...")
+        elif db_engine == "postgres":
             db_string = \
-                f'{conn_str}'
-            print('New connection to PostgreSQL DB...')
+                f"{conn_str}"
+            print(f"New connection to PostgreSQL DB...")
         else:
             raise mvc_exc.UnsupportedDatabaseEngine(
-                'No database engine with this name. '
-                'Choose one of the following: {}'.format(engines))
+                f"No database engine with this name." 
+                f"Choose one of the following: {engines}")
 
     return dataset.connect(db_string)
 
@@ -78,7 +78,7 @@ def create_table(conn, table_name):
         conn.load_table(table_name)
     except NoSuchTableError as e:
         print(f"Table {e} does not exist. It will be created now")
-        conn.get_table(table_name, primary_id='name', primary_type='String')
+        conn.get_table(table_name, primary_id="name", primary_type="String")
         print(f"Created table {table_name} on database {DB_name}")
 
 '''
@@ -125,11 +125,11 @@ def insert_chars(conn, chars, table_name):
     try:
         for x in chars:
             table.insert(dict(
-                name=x['name'], 
-                ac=x['ac'], 
-                damage=x['damage'],
-                hp=x['hp'],
-                to_hit=x['to_hit']
+                name=x["name"], 
+                ac=x["ac"], 
+                damage=x["damage"],
+                hp=x["hp"],
+                to_hit=x["to_hit"]
                 ))
     except IntegrityError as e:
         print(f"At least one in {[x['name'] for x in chars]} was already stored in table {table.table.name}. \nOriginal Exception raised: {e}")
@@ -204,13 +204,13 @@ def update_char(conn, name, ac, damage, hp, to_hit, table_name):
 
     Raises
     ------
-    mvc_exc.ItemNotStored: if the record is not stored in the table.
+    mvc_exc.CharNotStored: if the record is not stored in the table.
     """
     table = conn.load_table(table_name)
     row = table.find_one(name=name)
     if row is not None:
-        item = {'name': name, 'ac': ac, 'damage': damage, 'hp': hp, 'to_hit': to_hit}
-        table.update(item, keys=['name'])
+        item = {"name": name, "ac": ac, "damage": damage, "hp": hp, "to_hit": to_hit}
+        table.update(item, keys=["name"])
     else:
         raise mvc_exc.CharNotStored(f"Can\'t update {name} because it\'s not stored in table {table.table.name}")
 
@@ -242,108 +242,4 @@ def delete_char(conn, char_name, table_name):
 
 
 
-# '''backend list'''
 
-# # global Martial Arts opponents list, for creating, updating, etc...
-# opponent_list = list()
-
-
-
-
-# # create char list
-
-
-# def create_chars(game_chars):
-#     global opponent_list
-#     opponent_list = game_chars
-
-# # create individual char
-
-
-# def create_char(name, ac, damage, hp, to_hit):
-#     global opponent_list
-#     results = list(filter(lambda x: x["name"] == name, opponent_list))
-#     if results:
-#         raise mvc_exc.CharAlreadyStored(f"{name} already stored!")
-#     else:
-#         opponent_list.append({"name": name,
-#                                 "ac": ac,
-#                                 "damage": damage, 
-#                                 "hp": hp, 
-#                                 "to_hit": to_hit})
-
-# # retrive and get char
-
-
-# def read_char(name):
-#     global opponent_list
-#     opponents = list(filter(lambda x: x['name'] == name, opponent_list))
-#     if opponents:
-#         return opponents[0]
-#     else:
-#         raise mvc_exc.CharNotStored(
-#             f"Can't read {name} because it's not stored"
-#         )
-
-# # read char list
-
-
-# def read_chars():
-#     global opponent_list
-#     return [list_item for list_item in opponent_list]
-
-# # update individual char
-
-
-# def update_char(name, ac, damage, hp, to_hit):
-#     global opponent_list
-#     # Python 3.x removed tuple parameters unpacking (PEP 3113), so we have to do it manually (index_x is a tuple, index_oppponent is a list of tuples)
-#     index_oppponent = list(
-#         filter(lambda index_x: index_x[1]["name"]
-#                == name, enumerate(opponent_list))
-#     )
-#     if index_oppponent:
-#         i, item_to_update = index_oppponent[0][0], index_oppponent[0][1]
-#         opponent_list[i] = {"name": name,
-#                             "ac": ac,
-#                             "damage": damage, 
-#                             "hp": hp, 
-#                             "to_hit": to_hit}
-#     else:
-#         raise mvc_exc.CharNotStored(
-#             f"Can't update {name} because it's not stored"
-#         )
-
-# # delete char
-
-
-# def delete_char(name):
-#     global opponent_list
-#     # From architect: Python 3.x removed tuple parameters unpacking (PEP 3113), so we have to do it manually (i_x is a tuple, idxs_items is a list of tuples)
-#     index_oppponent = list(
-#         filter(lambda index_x: index_x[1]["name"] == name, enumerate(opponent_list)))
-#     if index_oppponent:
-#         i, item_to_delete = index_oppponent[0][0], index_oppponent[0][1]
-#         del opponent_list[i]
-#     else:
-#         raise mvc_exc.CharNotStored(
-#             f"Can't delete {name} because it's not stored."
-#         )
-
-
-# # opponents: dict = [{"name": "player1", "arena_level": 1, "damage": 7, "hp": 25, "to_hit": 35,
-# #                     "strength": 15, "dexterity": 15, "constitution": 15},
-# #                    {"name": "master", "arena_level": 4, "damage": 50, "hp": 1000, "to_hit": 75,
-# #                     "strength": 15, "dexterity": 15, "constitution": 15},
-# #                    {"name": "warrior", "arena_level": 1, "damage": 5, "hp": 15, "to_hit": 25,
-# #                     "strength": 15, "dexterity": 15, "constitution": 15},
-# #                    {"name": "veteran", "arena_level": 2, "damage": 8,
-# #                     "hp": 1000, "to_hit": 30,
-# #                     "strength": 15, "dexterity": 15, "constitution": 15},
-# #                    {"name": "grandmaster", "arena_level": 5,
-# #                     "damage": 60, "arena_level": 1250, "to_hit": 80,
-# #                     "strength": 15, "dexterity": 15, "constitution": 15},
-# #                    {"name": "elite", "arena_level": 3, "damage": 15, "hp": 100, "to_hit": 35,
-# #                     "strength": 15, "dexterity": 15, "constitution": 15}]
-
-# #player_items: dict = [ {"name": "player1", "hd": 1, "damage": 7, "hp": 25, "to_hit": 35}]
