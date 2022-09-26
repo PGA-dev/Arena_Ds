@@ -131,7 +131,7 @@ def insert_chars(conn, chars, table_name):
                 hp=x["hp"],
                 to_hit=x["to_hit"]
                 ))
-    except IntegrityError as e:
+    except mvc_exc.CharAlreadyStored as e:
         print(f"At least one in {[x['name'] for x in chars]} was already stored in table {table.table.name}. \nOriginal Exception raised: {e}")
 
 '''
