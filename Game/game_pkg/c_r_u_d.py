@@ -6,6 +6,7 @@ from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.exc import IntegrityError, NoSuchTableError
 from game_pkg import exceptions as mvc_exc
 from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 import dataset
 user = "postgres"
@@ -17,17 +18,41 @@ DB_name = "Arena"
 conn_str = f"{db_type}://{user}:{pw}@{hostserver}:{port}/{DB_name}"
 engine = create_engine(conn_str)
 
+'''
+
+SESSION MAKING EXAMPLES
+session = sessionmaker(engine)
+try:
+    session.add(some_object)
+    session.add(some_other_object)
+    session.commit()
+finally:
+    session.close()
+
+Session = sessionmaker(engine)
+
+# bind an individual session to a connection
+
+with engine.connect() as connection:
+    with Session(bind=connection) as session:
+        # work with session
 
 
+# application starts, sessionmaker does not have
+# an engine bound yet
+Session = sessionmaker()
 
+# ... later, when an engine URL is read from a configuration
+# file or other events allow the engine to be created
+engine = create_engine('sqlite:///foo.db')
+Session.configure(bind=engine)
 
+sess = Session()
+# work with session
+'''
 
 def connect_to_db(db_name=DB_name, db_engine=engine):
     """Connect to a database. Create the database if there isn't one yet.
-
-    The database can be a SQLite DB (either a DB file or an in-memory DB), or a PostgreSQL DB. In order to connect to a PostgreSQL DB you have first to create a database, create a user, and finally grant him all necessary privileges on that database and tables.
-    'postgresql://<username>:<password>@localhost:<PostgreSQL port>/<db name>'
-    Note: at the moment it looks it's not possible to close a connection manually (e.g. like calling conn.close() in sqlite3).
 
 
     Parameters
