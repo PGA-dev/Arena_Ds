@@ -12,3 +12,6 @@ class CharNotStored(Exception):
 
 class UnsupportedDatabaseEngine(Exception):
     pass
+
+class GameSystemExit(SystemExit(BaseException)):
+    pass

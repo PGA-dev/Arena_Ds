@@ -8,7 +8,7 @@ from game_pkg import exceptions as mvc_exc
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-import dataset
+#import dataset
 user = "postgres"
 pw = "PGAADMIN"
 db_type = "postgresql"
@@ -84,7 +84,7 @@ def connect_to_db(db_name=DB_name, db_engine=engine):
                 f"No database engine with this name." 
                 f"Choose one of the following: {engines}")
 
-    return dataset.connect(db_string)
+    return conn(db_string)
 
 
 def create_table(conn, table_name):
